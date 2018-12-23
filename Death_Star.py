@@ -1235,7 +1235,7 @@ class Missile(pygame.sprite.Sprite):
             self.enemy_collide = 1
             self.image = missile_red
             
-        #It can then collide with other enemies such as Block and Turret
+        #It can then collide with Block enemies
         if self.enemy_collide == 1:
             
             hit_list5 = pygame.sprite.spritecollide(self, block, False, pygame.sprite.collide_circle)       
@@ -1244,16 +1244,7 @@ class Missile(pygame.sprite.Sprite):
                 all_sprites.add(expl2) 
                 self.kill()
             for self in hit_list5:
-                self.shot()
-        
-            hit_list3 = pygame.sprite.spritecollide(self, turrets, False, pygame.sprite.collide_circle)
-            for missiles in hit_list3:
-                expl2 = Blowup(self.rect.left-46, self.rect.top-29)
-                all_sprites.add(expl2)
-                self.kill()
-            for self in hit_list3:
-                self.health -= 5
-                self.shot()             
+                self.shot()                             
                      
         
         #Collision with Player
@@ -1504,29 +1495,16 @@ def Level1():
         c = Block(random.randrange (30, 530), random.randrange(-5000, -50))
         all_sprites.add(c)
         block.add(c)
-    for i in range(16):
-        b = Bomber(random.randrange(250, 350), random.randrange(-7000, -20))
-        all_sprites.add(b)
-        bomber.add(b)  
-        
+       
 def Level2():
     for i in range(20):
         c = Block(random.randrange(30, 530), random.randrange(-7000, -50))
         all_sprites.add(c)
         block.add(c)
-    for i in range(13):
+    for i in range(14):
         b = Bomber(random.randrange(250, 350), random.randrange(-7000, -20))
         all_sprites.add(b)
         bomber.add(b)    
-    
-    for i in range(20):
-        c = Block(random.randrange(30, 530), random.randrange(-7000, -50))
-        all_sprites.add(c)
-        block.add(c)
-    for i in range(16):
-        b = Bomber(random.randrange(250, 350), random.randrange(-7000, -20))
-        all_sprites.add(b)
-        bomber.add(b)
         
 def Level3():
     for i in range(4):
