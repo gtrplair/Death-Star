@@ -66,6 +66,9 @@ puff1 = pygame.image.load('missilesmoke.png').convert()
 puff2 = pygame.image.load('missilesmoke2.png').convert()
 #Bomber wall impact explosion spritesheet
 bomber_trench_explosion = pygame.image.load('bomber_trench_explosion.png').convert_alpha()
+#Bomber missile images
+missile_white = pygame.image.load('missile_white.png').convert_alpha()
+missile_red = pygame.image.load('missile_red.png').convert_alpha()
 
 #Turret
 turret_image = pygame.image.load('turret3.png').convert_alpha()
@@ -1173,7 +1176,7 @@ class Bomberex (pygame.sprite.Sprite):
 class Missile(pygame.sprite.Sprite):
     def __init__(self,x,y): 
         pygame.sprite.Sprite.__init__(self)    
-        self.image = pygame.image.load('missile.png')
+        self.image = missile_white
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.radius = 6
@@ -1187,7 +1190,7 @@ class Missile(pygame.sprite.Sprite):
         self.last_smoke = pygame.time.get_ticks()
         self.smoke_delay = 30     
         self.birth = pygame.time.get_ticks()
-        self.death_delay = 20000
+        self.death_delay = 10000
         self.enemy_collide = 0
 
     def update(self):
@@ -1205,7 +1208,6 @@ class Missile(pygame.sprite.Sprite):
         if current_age - self.birth > self.death_delay:
             self.kill()
             expl = Blowup(self.rect.centerx - 85 , self.rect.bottom - 87) 
-            
             all_sprites.add(expl)
              
         #Missile follows player with basic AI
@@ -1229,8 +1231,9 @@ class Missile(pygame.sprite.Sprite):
         
         
         #If missile gets close enough to Player, it is activated
-        if abs(self.rect.x - player.rect.x) < 60 and abs(self.rect.y - player.rect.y) < 60:
+        if abs(self.rect.x - player.rect.x) < 70 and abs(self.rect.y - player.rect.y) < 70:
             self.enemy_collide = 1
+            self.image = missile_red
             
         #It can then collide with other enemies such as Block and Turret
         if self.enemy_collide == 1:
@@ -1250,7 +1253,7 @@ class Missile(pygame.sprite.Sprite):
                 self.kill()
             for self in hit_list3:
                 self.health -= 5
-                self.shot()            
+                self.shot()             
                      
         
         #Collision with Player
@@ -1511,6 +1514,15 @@ def Level2():
         c = Block(random.randrange(30, 530), random.randrange(-7000, -50))
         all_sprites.add(c)
         block.add(c)
+    for i in range(13):
+        b = Bomber(random.randrange(250, 350), random.randrange(-7000, -20))
+        all_sprites.add(b)
+        bomber.add(b)    
+    
+    for i in range(20):
+        c = Block(random.randrange(30, 530), random.randrange(-7000, -50))
+        all_sprites.add(c)
+        block.add(c)
     for i in range(16):
         b = Bomber(random.randrange(250, 350), random.randrange(-7000, -20))
         all_sprites.add(b)
@@ -1568,7 +1580,7 @@ def gameLoop():
         all_sprites.draw(screen)
         draw_shield_bar(screen, 5, 5, player.shield)
         draw_health_bar(screen, 5, 20, player.health) 
-        draw_missile_bar(screen, 5, 35, player.missile) 
+        draw_missile_bar(screen, 495, 5, player.missile) 
         pygame.display.flip()
     
     pygame.quit()
