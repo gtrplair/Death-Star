@@ -572,7 +572,6 @@ class Bomber(pygame.sprite.Sprite):
 
                 self.health -= 1
                 self.rect.y -= 2
-                print(self.health)
                 if self.health == 0:
                     self.shot()
             for bulletleft in hit_list:
@@ -704,13 +703,14 @@ class Turret(pygame.sprite.Sprite):
             self.health -= 1
             if self.health == 0:
                 self.shot() 
+                tie_ex.play()
                 
         for bulletleft in hit_list:
             expl = Laserex(bulletleft.rect.left - 10, self.rect.top + 42)
             all_sprites.add(expl)   
             
             
-#Turret explosion animation
+#Turret explosion animation, randomly rotated.
 class Turret_Ex1 (pygame.sprite.Sprite):
 
     def __init__(self, position):
@@ -782,7 +782,7 @@ class Turret_Ex1 (pygame.sprite.Sprite):
 
             
                 
-#Explosion animation used by multiple sprites.
+#Explosion animation used by multiple sprites, randomly rotated.
 class Blowup (pygame.sprite.Sprite):
 
     def __init__(self, x, y):
@@ -848,7 +848,7 @@ class Blowup (pygame.sprite.Sprite):
         self.frame_rate = 30
 
 
-#Player Missile explosion animation
+#Player Missile explosion animation, randomly rotated.
 class PlayerMissileEx (pygame.sprite.Sprite):
 
     def __init__(self, x, y):
@@ -1187,9 +1187,18 @@ class Missile(pygame.sprite.Sprite):
         self.last_smoke = pygame.time.get_ticks()
         self.smoke_delay = 30     
         self.birth = pygame.time.get_ticks()
-        self.death_delay = 10000
+        self.death_delay = 20000
+        self.enemy_collide = 0
 
     def update(self):
+        
+        #Smoke trail is created
+        now = pygame.time.get_ticks()
+        if now - self.last_smoke > self.smoke_delay:
+            self.last_smoke = now
+            smoke = Smoke(self.rect.centerx + 28 , self.rect.bottom + 23) 
+            all_sprites.add(smoke)
+            smokes.add(smoke)          
         
         #Missile explodes after a certain time
         current_age = pygame.time.get_ticks()
@@ -1218,13 +1227,31 @@ class Missile(pygame.sprite.Sprite):
         self.pos += self.vel + 0.8 * self.acc
         self.rect.center = self.pos
         
-        #Smoke trail is created
-        now = pygame.time.get_ticks()
-        if now - self.last_smoke > self.smoke_delay:
-            self.last_smoke = now
-            smoke = Smoke(self.rect.centerx + 28 , self.rect.bottom + 23) 
-            all_sprites.add(smoke)
-            smokes.add(smoke)           
+        
+        #If missile gets close enough to Player, it is activated
+        if abs(self.rect.x - player.rect.x) < 60 and abs(self.rect.y - player.rect.y) < 60:
+            self.enemy_collide = 1
+            
+        #It can then collide with other enemies such as Block and Turret
+        if self.enemy_collide == 1:
+            
+            hit_list5 = pygame.sprite.spritecollide(self, block, False, pygame.sprite.collide_circle)       
+            for missiles in hit_list5:
+                expl2 = Blowup(self.rect.left-46, self.rect.top-29)
+                all_sprites.add(expl2) 
+                self.kill()
+            for self in hit_list5:
+                self.shot()
+        
+            hit_list3 = pygame.sprite.spritecollide(self, turrets, False, pygame.sprite.collide_circle)
+            for missiles in hit_list3:
+                expl2 = Blowup(self.rect.left-46, self.rect.top-29)
+                all_sprites.add(expl2)
+                self.kill()
+            for self in hit_list3:
+                self.health -= 5
+                self.shot()            
+                     
         
         #Collision with Player
         hit_list = pygame.sprite.spritecollide(self, [player], False)
@@ -1243,8 +1270,8 @@ class Missile(pygame.sprite.Sprite):
                     player.health -= 20      
                     
         #Collision with Player lasers
-        hit_list = pygame.sprite.spritecollide(self, bullets, True, pygame.sprite.collide_circle)
-        for hit in hit_list:
+        hit_list6 = pygame.sprite.spritecollide(self, bullets, True, pygame.sprite.collide_circle)
+        for hit in hit_list6:
             self.kill()
             expl2 = Blowup(self.rect.left - 60, self.rect.top - 60)
             all_sprites.add(expl2) 
@@ -1414,8 +1441,7 @@ class BomberSmoke(pygame.sprite.Sprite):
 class BomberSmoke2(pygame.sprite.Sprite):
 
     def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)    
-
+        pygame.sprite.Sprite.__init__(self)
         self.image = puff2
         self.rect = self.image.get_rect()
         self.image.set_colorkey(BLACK)
@@ -1478,7 +1504,7 @@ def Level1():
     for i in range(16):
         b = Bomber(random.randrange(250, 350), random.randrange(-7000, -20))
         all_sprites.add(b)
-        bomber.add(b)
+        bomber.add(b)  
         
 def Level2():
     for i in range(20):
