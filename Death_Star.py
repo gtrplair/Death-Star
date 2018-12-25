@@ -207,7 +207,6 @@ class Player(pygame.sprite.Sprite):
         self.shoot_delay = 250
         self.shield = 100
         self.health = 100
-        self.force = 100
         self.shoot_delay = 250
         self.last_shot = pygame.time.get_ticks()
         self.missile = 100
@@ -303,14 +302,11 @@ class Player(pygame.sprite.Sprite):
             self.shield = 100
         else:
             self.shield += 0.1
-        if self.force <= 0:
-            self.force += 0.08
-        if self.force >= 100:
-            self.force = 100
             
         #shooting player missile
         if pressed[pygame.K_v]:
-            self.shootmissile()     
+            self.shootmissile()   
+            
             
 #Player left laser sprite            
 class Bulletleft(pygame.sprite.Sprite):
@@ -1531,6 +1527,13 @@ def menu():
     while menu:
         pygame.display.flip()   
         clock.tick(FPS)
+        draw_shield_bar(screen, 5, 5, player.shield)
+        draw_text(screen, "shield", 15, 135, 0)
+        draw_health_bar(screen, 5, 20, player.health) 
+        draw_text(screen, "health", 15, 135, 15)
+        draw_missile_bar(screen, 495, 5, player.missile) 
+        draw_text(screen, "rockets", 15, 466, 0)
+        
         draw_text(screen, "Press Enter to play", 45, WIDTH/2, HEIGHT/2 - 60)
         draw_text(screen, "Arrow keys to move", 20, WIDTH/2, HEIGHT/2 + 60)
         draw_text(screen, "Spacebar to fire lasers", 20, WIDTH/2, HEIGHT/2 + 90)
